@@ -1,6 +1,6 @@
 ﻿internal partial class Program
 {
-    private class Elevator
+    public class Elevator
     {
         public Elevator(int currentFloor, int capacity)
         {
@@ -33,13 +33,8 @@
         }
 
         public void Stop()
-        {
+        {   
             MovingDirection = Moving.Stationairy;
         }
-    }
-    public enum Moving{
-        Stationairy,
-        Up,
-        Down
     }
 }

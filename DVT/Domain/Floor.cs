@@ -1,6 +1,6 @@
 ﻿internal partial class Program
 {
-    private class Floor
+    public class Floor
     {
         public Floor(int peopleWaiting)
         {

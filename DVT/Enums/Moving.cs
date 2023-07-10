@@ -1,8 +1,6 @@
-﻿internal partial class Program
+﻿public enum Moving
 {
-    public enum Moving{
-        Stationairy,
-        Up,
-        Down
-    }
+    Stationairy,
+    Up,
+    Down
 }

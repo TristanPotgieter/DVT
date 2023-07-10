@@ -1,42 +1,35 @@
-﻿using static Program;
+﻿using DVT.Domain;
+using DVT.Services.Interfaces;
 
 namespace DVT.Services
 {
-    internal class ElevatorService
+    public class ElevatorService
     {
         private readonly IInputService _inputService;
-        public ElevatorService(IInputService inputService)
+        private readonly IUserInteractionService _userInteractionService;
+        public ElevatorService(IInputService inputService, UserInteractionService userInteractionService)
         {
             _inputService = inputService;
+            _userInteractionService = userInteractionService;
         }
 
         public void RunElevators()
         {
             Console.WriteLine("Hello, welcome to the elevator app.");
-            var elevatorCount = _inputService.InputInterger("Please enter how many elevators your building has.");
-            var elevatorCapacity = _inputService.InputInterger("Please enter how many people each elevator can carry.");
             var floorCount = _inputService.InputInterger("Please enter how many floors your building has.");
 
-            var elevators = SetElevatorStartPositions(elevatorCount, elevatorCapacity, floorCount);
+            var elevators = _userInteractionService.GetElevatorStartPositions(floorCount);
+            var continueExecution = true;
 
-            while (true)
+            while (continueExecution)
             {
-                var floorStates = SetFloorStates(floorCount);
+                var floorStates = _userInteractionService.GetFloorStates(floorCount);
 
                 foreach (var floor in floorStates)
                 {
                     while (floor.Value.PeopleWaiting > 0)
                     {
-                        var eligibleElevator = elevators
-                            .Where(x => x.HasCapacity() && x.CanMove &&
-                                    (
-                                        (x.MovingDirection == Moving.Stationairy) ||
-                                        (x.MovingDirection == Moving.Up && x.CurrentFloor < floor.Key) ||
-                                        (x.MovingDirection == Moving.Down && x.CurrentFloor > floor.Key)
-                                    )
-                            )
-                            .OrderBy(x => x.DistanceFromFloor(floor.Key))
-                            .FirstOrDefault();
+                        var eligibleElevator = GetNextElegibleElevator(elevators, floor.Key);
 
                         if (eligibleElevator == null)
                         {
@@ -57,67 +50,25 @@ namespace DVT.Services
                     };
 
                 }
-                PrintCurrentState(elevators, floorStates);
+                _userInteractionService.PrintCurrentState(elevators, floorStates);
+
+                Console.WriteLine("Would you like to continue running this application y/N");
+                var continueResponse = Console.ReadLine().ToLower();
+                continueExecution = continueResponse == "y";
             }
         }
-        private IEnumerable<Elevator> SetElevatorStartPositions(int numberOfElevators, int elevatorCapacity, int numberOfFloors)
+
+        private ElevatorBase? GetNextElegibleElevator(IEnumerable<Elevator> elevators, int floor)
         {
-            var elevatorList = new List<Elevator>();
-            var counter = 0;
-
-            while (counter < numberOfElevators)
-            {
-                var elevatorFloor = _inputService.InputInterger($"On which floor is elevator {counter + 1}");
-
-                if (elevatorFloor > numberOfFloors || elevatorFloor < 0)
-                {
-                    Console.WriteLine("The floor you entered is not valid");
-                    continue;
-                }
-
-                elevatorList.Add(new Elevator(elevatorFloor, elevatorCapacity));
-                counter++;
-            }
-
-            return elevatorList;
-        }
-
-        private Dictionary<int, Floor> SetFloorStates(int numberOfFloors)
-        {
-            var counter = 0;
-            var dictionaryOfFloors = new Dictionary<int, Floor>();
-
-            while (counter <= numberOfFloors)
-            {
-                var peopleWaiting = _inputService.InputInterger($"How many people are waiting on floor number {counter}");
-
-                dictionaryOfFloors.Add(counter, new Floor(peopleWaiting));
-                counter++;
-            }
-
-            return dictionaryOfFloors;
-        }
-
-        private static void PrintCurrentState(IEnumerable<Elevator> elevators, IDictionary<int, Floor> floors)
-        {
-            var elevatorCounter = 1;
-            foreach (var elevator in elevators)
-            {
-                string message = $"elevator {elevatorCounter} is currently on floor {elevator.CurrentFloor}, " +
-                    $"with {elevator.Capacity - elevator.AvailableCapacity} on board and is currently ";
-
-                message += elevator.MovingDirection == Moving.Stationairy ? "stationairy" : $"moving {elevator.MovingDirection.ToString().ToLower()}";
-                Console.WriteLine(message);
-                elevator.Stop();
-                elevatorCounter++;
-            }
-            foreach (var floor in floors)
-            {
-                if (floor.Value.PeopleWaiting > 0)
-                {
-                    Console.WriteLine($"There are still {floor.Value.PeopleWaiting} waiting on floor {floor.Key}");
-                }
-            }
+            return elevators.Where(x => x.HasCapacity() && x.CanMove &&
+                                     (
+                                        (x.MovingDirection == Moving.Stationairy) ||
+                                        (x.MovingDirection == Moving.Up && x.CurrentFloor < floor) ||
+                                        (x.MovingDirection == Moving.Down && x.CurrentFloor > floor)
+                                     )
+                                )
+                                .OrderBy(x => x.DistanceFromFloor(floor))
+                                .FirstOrDefault();
         }
     }
 }

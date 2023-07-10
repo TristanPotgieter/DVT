@@ -1,40 +1,35 @@
-﻿internal partial class Program
+﻿using DVT.Domain;
+
+public sealed class Elevator : ElevatorBase
 {
-    public class Elevator
+    public Elevator(int currentFloor, int capacity) : base(currentFloor, capacity)
     {
-        public Elevator(int currentFloor, int capacity)
-        {
-            CurrentFloor = currentFloor;
-            Capacity = capacity;
-            AvailableCapacity = capacity;
-            MovingDirection = Moving.Stationairy;
-            CanMove = true;
-        }
+        MovingDirection = Moving.Stationairy;
+        CanMove = true;
+    }
 
-        public int CurrentFloor { get; private set; }
-        public int Capacity { get; private set; }
-        public int AvailableCapacity { get; private set; }
-        public Moving MovingDirection { get; private set; }
-        public bool CanMove { get; set; }
+    public Moving MovingDirection { get; private set; }
+    public bool CanMove { get; private set; }
 
-        public int DistanceFromFloor(int floor)
-        {
-            return Math.Abs(CurrentFloor - floor);
-        }
 
-        public bool HasCapacity() => (AvailableCapacity > 0);
+    new public void MoveToFloor(int floor, int peopleOnboarding)
+    {
+        MovingDirection = floor > CurrentFloor ? Moving.Up : Moving.Down;
+        base.MoveToFloor(floor, peopleOnboarding);
+        CanMove = false;
+    }
 
-        public void MoveToFloor(int floor, int peopleOnboarding )
-        {
-            MovingDirection = floor == 0? Moving.Stationairy:(floor > CurrentFloor? Moving.Up : Moving.Down);
-            CurrentFloor = floor;
-            AvailableCapacity -= peopleOnboarding;
-            CanMove = false;
-        }
+    public void Stop()
+    {
+        MovingDirection = Moving.Stationairy;
+    }
 
-        public void Stop()
-        {   
-            MovingDirection = Moving.Stationairy;
-        }
+    new public void PrintState(int elevatorDesignation)
+    {
+        string message = $"elevator {elevatorDesignation} is currently on floor {CurrentFloor}, " +
+                         $"with {Capacity - AvailableCapacity} on board and is currently ";
+
+        message += MovingDirection == Moving.Stationairy ? "stationairy" : $"moving {MovingDirection.ToString().ToLower()}";
+        Console.WriteLine(message);
     }
 }

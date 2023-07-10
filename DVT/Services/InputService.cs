@@ -1,4 +1,6 @@
-﻿namespace DVT.Services
+﻿using DVT.Services.Interfaces;
+
+namespace DVT.Services
 {
     public class InputService : IInputService
     {

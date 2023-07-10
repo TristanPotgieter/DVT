@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using DVT.Services;
+using DVT.Services.Interfaces;
 
 internal partial class Program
 {

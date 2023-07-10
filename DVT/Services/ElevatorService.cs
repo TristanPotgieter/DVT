@@ -58,7 +58,7 @@ namespace DVT.Services
             }
         }
 
-        private ElevatorBase? GetNextElegibleElevator(IEnumerable<Elevator> elevators, int floor)
+        private Elevator? GetNextElegibleElevator(IEnumerable<Elevator> elevators, int floor)
         {
             return elevators.Where(x => x.HasCapacity() && x.CanMove &&
                                      (

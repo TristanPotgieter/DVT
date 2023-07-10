@@ -7,7 +7,7 @@ namespace DVT.Services
     {
         private readonly IInputService _inputService;
         private readonly IUserInteractionService _userInteractionService;
-        public ElevatorService(IInputService inputService, UserInteractionService userInteractionService)
+        public ElevatorService(IInputService inputService, IUserInteractionService userInteractionService)
         {
             _inputService = inputService;
             _userInteractionService = userInteractionService;

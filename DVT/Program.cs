@@ -15,8 +15,9 @@ internal partial class Program
     {
         var builder = new ContainerBuilder();
 
-        builder.RegisterType<ElevatorService>().AsSelf();
         builder.RegisterType<InputService>().As<IInputService>().SingleInstance();
+        builder.RegisterType<UserInteractionService>().As<IUserInteractionService>().SingleInstance();
+        builder.RegisterType<ElevatorService>().AsSelf();
         return builder.Build();
     }
 }

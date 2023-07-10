@@ -39,8 +39,8 @@ namespace DVT.Services
                         var sizeFlag = eligibleElevator.AvailableCapacity - floor.Value.PeopleWaiting;
                         if (sizeFlag > 0)
                         {
-                            floor.Value.ElevatorArrived(floor.Value.PeopleWaiting);
                             eligibleElevator.MoveToFloor(floor.Key, floor.Value.PeopleWaiting);
+                            floor.Value.ElevatorArrived(floor.Value.PeopleWaiting);
                         }
                         else
                         {
